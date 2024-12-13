@@ -170,7 +170,7 @@ void delete_user()
     }
 }
 
-int main()
+void main()
 {
     int choice;
     initialize_file();
@@ -209,6 +209,4 @@ int main()
             printf("Enter a valid choice\n");
         }
     } while (choice != 5);
-
-    return 0;
 }
