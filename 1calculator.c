@@ -4,6 +4,16 @@
 // Max size for expression
 #define MAX_SIZE 1000
 
+int is_space(char ch) {
+    if(ch == ' ') return 1;
+    return 0;
+}
+
+int is_digit(char ch) {
+    if(ch >= '0' && ch <= '9')return 1;
+    return 0;
+}
+
 // Definition for operator stack
 typedef struct
 {
@@ -137,10 +147,10 @@ int evaluate_expression(char *expression)
     operandStack.top = -1;
 
     // Parsing the expression
-    int i;
-    for ( i = 0; expression[i] != '\0'; i++)
+    int ind;
+    for ( ind = 0; expression[ind] != '\0'; ind++)
     {
-        char ch = expression[i];
+        char ch = expression[ind];
 
         // Ignoring white spaces
         if (isspace(ch))
@@ -150,16 +160,16 @@ int evaluate_expression(char *expression)
         else if (isdigit(ch))
         {
             int num = 0;
-            while (isdigit(expression[i]) || isspace(expression[i]))
+            while (isdigit(expression[ind]) || isspace(expression[ind]))
             {
-                if (isdigit(expression[i]))
+                if (isdigit(expression[ind]))
                 {
                     num *= 10;
-                    num += expression[i] - '0';
+                    num += expression[ind] - '0';
                 }
-                i++;
+                ind++;
             }
-            i--;
+            ind--;
             push_operand(&operandStack, num);
         }
 
