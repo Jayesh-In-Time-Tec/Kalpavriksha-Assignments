@@ -1,215 +1,163 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// Max size for expression
-#define MAX_SIZE 1000
+#define INITIAL_SIZE 1000
 
-int is_space(char ch) {
-    if(ch == ' ') return 1;
+int is_space(char character) {
+    if(character == ' ' || character == '\n' || character == '\r') return 1;
     return 0;
 }
 
-int is_digit(char ch) {
-    if(ch >= '0' && ch <= '9')return 1;
+int is_digit(char character) {
+    if(character >= '0' && character <= '9') return 1;
     return 0;
 }
 
-// Definition for operator stack
-typedef struct
-{
+typedef struct {
     int top;
-    char data[MAX_SIZE];
-} operator;
+    char data[INITIAL_SIZE];
+} operator_stack;
 
-// Definition for operand stack
-typedef struct
-{
+typedef struct {
     int top;
-    int data[MAX_SIZE];
-} operand;
+    int data[INITIAL_SIZE];
+} operand_stack;
 
-// Funtion associated with operator stack
-void push_operator(operator* stk, char val)
-{
-    // Error handling
-    if (stk->top == MAX_SIZE - 1)
-    {
+void push_operator(operator_stack* stack, char value) {
+    if (stack->top == INITIAL_SIZE - 1) {
         printf("Error: stack overflow\n");
         exit(EXIT_FAILURE);
     }
-    stk->top++;
-    stk->data[stk->top] = val;
+    stack->top++;
+    stack->data[stack->top] = value;
 }
 
-void pop_operator(operator* stk)
-{
-    // Error handling
-    if (stk->top == -1)
-    {
+void pop_operator(operator_stack* stack) {
+    if (stack->top == -1) {
         printf("Error: stack underflow\n");
         exit(EXIT_FAILURE);
     }
-
-    stk->top--;
+    stack->top--;
 }
 
-// Funtion associated with operand stack
-void push_operand(operand *stk, int val)
-{
-    // Error handling
-    if (stk->top == MAX_SIZE - 1)
-    {
+void push_operand(operand_stack* stack, int value) {
+    if (stack->top == INITIAL_SIZE - 1) {
         printf("Error: stack overflow\n");
         exit(EXIT_FAILURE);
     }
-
-    stk->top++;
-    stk->data[stk->top] = val;
+    stack->top++;
+    stack->data[stack->top] = value;
 }
 
-void pop_operand(operand *stk)
-{
-    // Error handling
-    if (stk->top == -1)
-    {
+void pop_operand(operand_stack* stack) {
+    if (stack->top == -1) {
         printf("Error: stack underflow\n");
         exit(EXIT_FAILURE);
     }
-    stk->top--;
+    stack->top--;
 }
 
-// Operator precedance checking function
-int precedance(char operator)
-{
-    // Associativity of + & - being same
-    if (operator== '+' || operator== '-')
+int operator_precedence(char operator_character) {
+    if (operator_character == '+' || operator_character == '-')
         return 0;
-
-    // Associativity of * & / being same
-    if (operator== '*' || operator== '/')
+    if (operator_character == '*' || operator_character == '/')
         return 1;
+    return -1;
 }
 
-// Function for solving binary operations
-void solve_operator(operand * or, operator* op)
-{
-    // Extracting variables from operand stack
-    int num1 = or->data[or->top];
-    pop_operand(or);
-    int num2 = or->data[or->top];
-    pop_operand(or);
+void solve_operator(operand_stack* operand_stack_instance, operator_stack* operator_stack_instance) {
+    int operand1 = operand_stack_instance->data[operand_stack_instance->top];
+    pop_operand(operand_stack_instance);
+    int operand2 = operand_stack_instance->data[operand_stack_instance->top];
+    pop_operand(operand_stack_instance);
 
-    // Extracting operator from operator stack
-    char operator= op->data[op->top];
-    pop_operator(op);
+    char operator_character = operator_stack_instance->data[operator_stack_instance->top];
+    pop_operator(operator_stack_instance);
 
-    // Result evaluation
     int result;
-    switch (operator)
-    {
-    case '+':
-        result = num2 + num1;
-        break;
-
-    case '-':
-        result = num2 - num1;
-        break;
-
-    case '*':
-        result = num2 * num1;
-        break;
-
-    case '/':
-
-        // Checking division by 0 condition
-        if (num1 == 0)
-        {
-            printf("Error: Division by zero");
-            exit(EXIT_FAILURE);
-        }
-
-        result = num2 / num1;
-        break;
+    switch (operator_character) {
+        case '+':
+            result = operand2 + operand1;
+            break;
+        case '-':
+            result = operand2 - operand1;
+            break;
+        case '*':
+            result = operand2 * operand1;
+            break;
+        case '/':
+            if (operand1 == 0) {
+                printf("Error: Division by zero");
+                exit(EXIT_FAILURE);
+            }
+            result = operand2 / operand1;
+            break;
     }
 
-    // Pushing result in operand stack
-    push_operand(or, result);
+    push_operand(operand_stack_instance, result);
 }
 
-// Function for evaluating the expression
-int evaluate_expression(char *expression)
-{
+int evaluate_expression(char* expression) {
+    operator_stack operator_stack_instance;
+    operator_stack_instance.top = -1;
 
-    // Declaring operator & operand stack
-    operator operatorStack;
-    operatorStack.top = -1;
-    operand operandStack;
-    operandStack.top = -1;
+    operand_stack operand_stack_instance;
+    operand_stack_instance.top = -1;
 
-    // Parsing the expression
-    int ind;
-    for ( ind = 0; expression[ind] != '\0'; ind++)
-    {
-        char ch = expression[ind];
+    int index;
+    for (index = 0; expression[index] != '\0'; index++) {
+        char character = expression[index];
 
-        // Ignoring white spaces
-        if (isspace(ch))
+        if (is_space(character))
             continue;
 
-        // Handling integers in expression
-        else if (isdigit(ch))
-        {
-            int num = 0;
-            while (isdigit(expression[ind]) || isspace(expression[ind]))
-            {
-                if (isdigit(expression[ind]))
-                {
-                    num *= 10;
-                    num += expression[ind] - '0';
-                }
-                ind++;
+        else if (is_digit(character)) {
+            int number = 0;
+            while (is_digit(expression[index])) {
+                number *= 10;
+                number += expression[index] - '0';
+                index++;
             }
-            ind--;
-            push_operand(&operandStack, num);
+            push_operand(&operand_stack_instance, number);
+
+            while (is_space(expression[index])) {
+                index++;
+            }
+            index--;
         }
 
-        // Handling operators in the expression
-        else if (ch == '+' || ch == '-' || ch == '*' || ch == '/')
-        {
-            while (operatorStack.top != -1 && precedance(ch) <= precedance(operatorStack.data[operatorStack.top]))
-            {
-                solve_operator(&operandStack, &operatorStack);
+        else if (character == '+' || character == '-' || character == '*' || character == '/') {
+            while (operator_stack_instance.top != -1 && 
+                   operator_precedence(character) <= operator_precedence(operator_stack_instance.data[operator_stack_instance.top])) {
+                solve_operator(&operand_stack_instance, &operator_stack_instance);
             }
-            push_operator(&operatorStack, ch);
-        }
-
-        // Handling other characters
-        else
-        {
+            push_operator(&operator_stack_instance, character);
+        } else {
             printf("Invalid expression\n");
             exit(EXIT_FAILURE);
         }
     }
 
-    while (operatorStack.top != -1)
-    {
-        solve_operator(&operandStack, &operatorStack);
+    while (operator_stack_instance.top != -1) {
+        solve_operator(&operand_stack_instance, &operator_stack_instance);
     }
 
-    // Last element in operand stack holds the result
-    return operandStack.data[operandStack.top];
+    return operand_stack_instance.data[operand_stack_instance.top];
 }
 
-int main()
-{
-    // Expression declaration & input
-    char expression[MAX_SIZE];
-    printf("Enter the expression:\n");
-    fgets(expression, MAX_SIZE, stdin);
+int main() {
+    char* expression = (char*)malloc(INITIAL_SIZE * sizeof(char));
+    if (!expression) {
+        printf("Memory allocation failed\n");
+        exit(EXIT_FAILURE);
+    }
 
-    // Output generation & display
+    printf("Enter the expression:\n");
+    fgets(expression, INITIAL_SIZE, stdin);
+
     int result = evaluate_expression(expression);
     printf("The result of the expression is: %d", result);
-    getch();
+
+    free(expression);
     return 0;
 }
