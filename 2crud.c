@@ -1,78 +1,88 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 #define FILE_NAME "text.txt"
 
-typedef struct
-{
+typedef struct {
     int id;
     char *name;
     int age;
 } User;
 
-void error_handler(char *message)
-{
+void error_handler(char *message) {
     printf("%s", message);
     exit(EXIT_FAILURE);
 }
 
-void initialize_file()
-{
+int is_valid_name(const char *name) {
+    for (int i = 0; name[i] != '\0'; i++) {
+        if (!isalpha(name[i]) && name[i] != ' ') {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+int is_valid_id_or_age(int value) {
+    return value > 0;
+}
+
+void initialize_file() {
     FILE *file_pointer = fopen(FILE_NAME, "a");
-    if (file_pointer == NULL)
-    {
+    if (file_pointer == NULL) {
         error_handler("Error: Couldn't load the file\n");
     }
     fclose(file_pointer);
 }
 
-void create_user()
-{
+void create_user() {
     FILE *file_pointer = fopen(FILE_NAME, "a+");
-    if (file_pointer == NULL)
-    {
+    if (file_pointer == NULL) {
         error_handler("Error: Creating new user\n");
     }
 
     User user;
     user.name = (char *)malloc(256 * sizeof(char));
-    if (user.name == NULL)
-    {
+    if (user.name == NULL) {
         error_handler("Error: Memory allocation failed\n");
     }
 
     printf("Enter user details\n");
-    printf("Enter ID: ");
-    scanf("%d", &user.id);
+
+    do {
+        printf("Enter ID: ");
+        if (scanf("%d", &user.id) != 1 || !is_valid_id_or_age(user.id)) {
+            printf("Invalid ID. Please enter a positive integer.\n");
+            while (getchar() != '\n');
+            continue;
+        }
+        break;
+    } while (1);
 
     int id, age, found = 0;
     char *name = (char *)malloc(256 * sizeof(char));
-    if (name == NULL)
-    {
+    if (name == NULL) {
         error_handler("Error: Memory allocation failed\n");
     }
 
-    while (fscanf(file_pointer, "%d", &id) == 1)
-    {
+    while (fscanf(file_pointer, "%d", &id) == 1) {
         fgetc(file_pointer);
         fgets(name, 256, file_pointer);
         char *age_str = strrchr(name, ' ');
-        if (age_str != NULL)
-        {
+        if (age_str != NULL) {
             *age_str = '\0';
             age = atoi(age_str + 1);
         }
 
-        if (id == user.id)
-        {
+        if (id == user.id) {
             found = 1;
             break;
         }
     }
 
-    if (found)
-    {
+    if (found) {
         printf("Error: User with ID %d already exists.\n", user.id);
         fclose(file_pointer);
         free(user.name);
@@ -80,13 +90,27 @@ void create_user()
         return;
     }
 
-    printf("Enter Name: ");
-    getchar();
-    fgets(user.name, 256, stdin);
-    user.name[strcspn(user.name, "\n")] = '\0';
+    do {
+        printf("Enter Name: ");
+        getchar();
+        fgets(user.name, 256, stdin);
+        user.name[strcspn(user.name, "\n")] = '\0';
+        if (!is_valid_name(user.name)) {
+            printf("Invalid Name. Please enter alphabets and spaces only.\n");
+            continue;
+        }
+        break;
+    } while (1);
 
-    printf("Enter Age: ");
-    scanf("%d", &user.age);
+    do {
+        printf("Enter Age: ");
+        if (scanf("%d", &user.age) != 1 || !is_valid_id_or_age(user.age)) {
+            printf("Invalid Age. Please enter a positive integer.\n");
+            while (getchar() != '\n');
+            continue;
+        }
+        break;
+    } while (1);
 
     fprintf(file_pointer, "%d %s %d\n", user.id, user.name, user.age);
     fclose(file_pointer);
@@ -96,29 +120,24 @@ void create_user()
     printf("User created successfully!\n");
 }
 
-void read_users()
-{
+void read_users() {
     FILE *file_pointer = fopen(FILE_NAME, "r");
-    if (file_pointer == NULL)
-    {
+    if (file_pointer == NULL) {
         error_handler("Error: Reading users\n");
     }
 
     printf("Users:\n");
     int id, age;
     char *name = (char *)malloc(256 * sizeof(char));
-    if (name == NULL)
-    {
+    if (name == NULL) {
         error_handler("Error: Memory allocation failed\n");
     }
 
-    while (fscanf(file_pointer, "%d", &id) == 1)
-    {
+    while (fscanf(file_pointer, "%d", &id) == 1) {
         fgetc(file_pointer);
         fgets(name, 256, file_pointer);
         char *age_str = strrchr(name, ' ');
-        if (age_str != NULL)
-        {
+        if (age_str != NULL) {
             *age_str = '\0';
             age = atoi(age_str + 1);
         }
@@ -129,17 +148,14 @@ void read_users()
     fclose(file_pointer);
 }
 
-void update_user()
-{
+void update_user() {
     FILE *file_pointer = fopen(FILE_NAME, "r");
-    if (file_pointer == NULL)
-    {
+    if (file_pointer == NULL) {
         error_handler("Error: Updating file\n");
     }
 
     FILE *temp_file = fopen("temp.txt", "w");
-    if (temp_file == NULL)
-    {
+    if (temp_file == NULL) {
         error_handler("Error: Creating temporary file\n");
     }
 
@@ -149,32 +165,43 @@ void update_user()
 
     User user;
     user.name = (char *)malloc(256 * sizeof(char));
-    if (user.name == NULL)
-    {
+    if (user.name == NULL) {
         error_handler("Error: Memory allocation failed\n");
     }
 
-    while (fscanf(file_pointer, "%d", &user.id) == 1)
-    {
+    while (fscanf(file_pointer, "%d", &user.id) == 1) {
         fgetc(file_pointer);
         fgets(user.name, 256, file_pointer);
         char *age_str = strrchr(user.name, ' ');
-        if (age_str != NULL)
-        {
+        if (age_str != NULL) {
             *age_str = '\0';
             user.age = atoi(age_str + 1);
         }
 
-        if (user.id == id)
-        {
+        if (user.id == id) {
             found = 1;
-            printf("Enter new Name: ");
-            getchar();
-            fgets(user.name, 256, stdin);
-            user.name[strcspn(user.name, "\n")] = '\0';
 
-            printf("Enter new Age: ");
-            scanf("%d", &user.age);
+            do {
+                printf("Enter new Name: ");
+                getchar();
+                fgets(user.name, 256, stdin);
+                user.name[strcspn(user.name, "\n")] = '\0';
+                if (!is_valid_name(user.name)) {
+                    printf("Invalid Name. Please enter alphabets and spaces only.\n");
+                    continue;
+                }
+                break;
+            } while (1);
+
+            do {
+                printf("Enter new Age: ");
+                if (scanf("%d", &user.age) != 1 || !is_valid_id_or_age(user.age)) {
+                    printf("Invalid Age. Please enter a positive integer.\n");
+                    while (getchar() != '\n');
+                    continue;
+                }
+                break;
+            } while (1);
         }
 
         fprintf(temp_file, "%d %s %d\n", user.id, user.name, user.age);
@@ -184,14 +211,11 @@ void update_user()
     fclose(file_pointer);
     fclose(temp_file);
 
-    if (found)
-    {
+    if (found) {
         remove(FILE_NAME);
         rename("temp.txt", FILE_NAME);
         printf("User updated successfully!\n");
-    }
-    else
-    {
+    } else {
         remove("temp.txt");
         printf("User with ID %d not found.\n", id);
     }
