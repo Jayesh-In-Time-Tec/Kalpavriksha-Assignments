@@ -93,11 +93,11 @@ void create_user()
     {
         fgetc(file_pointer);
         fgets(name, 256, file_pointer);
-        char *age_str = strrchr(name, ' ');
-        if (age_str != NULL)
+        char *age_pointer = strrchr(name, ' ');
+        if (age_pointer != NULL)
         {
-            *age_str = '\0';
-            age = atoi(age_str + 1);
+            *age_pointer = '\0';
+            age = atoi(age_pointer + 1);
         }
 
         if (id == user.id)
@@ -171,11 +171,11 @@ void read_users()
     {
         fgetc(file_pointer);
         fgets(name, 256, file_pointer);
-        char *age_str = strrchr(name, ' ');
-        if (age_str != NULL)
+        char *age_pointer = strrchr(name, ' ');
+        if (age_pointer != NULL)
         {
-            *age_str = '\0';
-            age = atoi(age_str + 1);
+            *age_pointer = '\0';
+            age = atoi(age_pointer + 1);
         }
         printf("ID: %d, Name: %s, Age: %d\n", id, name, age);
     }
@@ -192,8 +192,8 @@ void update_user()
         error_handler("Error: Updating file\n");
     }
 
-    FILE *temp_file = fopen("temp.txt", "w");
-    if (temp_file == NULL)
+    FILE *temporary_file = fopen("temporary.txt", "w");
+    if (temporary_file == NULL)
     {
         error_handler("Error: Creating temporary file\n");
     }
@@ -213,11 +213,11 @@ void update_user()
     {
         fgetc(file_pointer);
         fgets(user.name, 256, file_pointer);
-        char *age_str = strrchr(user.name, ' ');
-        if (age_str != NULL)
+        char *age_pointer = strrchr(user.name, ' ');
+        if (age_pointer != NULL)
         {
-            *age_str = '\0';
-            user.age = atoi(age_str + 1);
+            *age_pointer = '\0';
+            user.age = atoi(age_pointer + 1);
         }
 
         if (user.id == id)
@@ -252,22 +252,22 @@ void update_user()
             } while (1);
         }
 
-        fprintf(temp_file, "%d %s %d\n", user.id, user.name, user.age);
+        fprintf(temporary_file, "%d %s %d\n", user.id, user.name, user.age);
     }
 
     free(user.name);
     fclose(file_pointer);
-    fclose(temp_file);
+    fclose(temporary_file);
 
     if (found)
     {
         remove(FILE_NAME);
-        rename("temp.txt", FILE_NAME);
+        rename("temporary.txt", FILE_NAME);
         printf("User updated successfully!\n");
     }
     else
     {
-        remove("temp.txt");
+        remove("temporary.txt");
         printf("User with ID %d not found.\n", id);
     }
 }
@@ -280,8 +280,8 @@ void delete_user()
         error_handler("Error: Deleting user\n");
     }
 
-    FILE *temp_file = fopen("temp.txt", "w");
-    if (temp_file == NULL)
+    FILE *temporary_file = fopen("temporary.txt", "w");
+    if (temporary_file == NULL)
     {
         error_handler("Error: Couldn't open temporary file\n");
     }
@@ -301,16 +301,16 @@ void delete_user()
     {
         fgetc(file_pointer);
         fgets(user.name, 256, file_pointer);
-        char *age_str = strrchr(user.name, ' ');
-        if (age_str != NULL)
+        char *age_pointer = strrchr(user.name, ' ');
+        if (age_pointer != NULL)
         {
-            *age_str = '\0';
-            user.age = atoi(age_str + 1);
+            *age_pointer = '\0';
+            user.age = atoi(age_pointer + 1);
         }
 
         if (user.id != id)
         {
-            fprintf(temp_file, "%d %s %d\n", user.id, user.name, user.age);
+            fprintf(temporary_file, "%d %s %d\n", user.id, user.name, user.age);
         }
         else
         {
@@ -320,17 +320,17 @@ void delete_user()
 
     free(user.name);
     fclose(file_pointer);
-    fclose(temp_file);
+    fclose(temporary_file);
 
     if (found)
     {
         remove(FILE_NAME);
-        rename("temp.txt", FILE_NAME);
+        rename("temporary.txt", FILE_NAME);
         printf("User deleted successfully!\n");
     }
     else
     {
-        remove("temp.txt");
+        remove("temporary.txt");
         printf("User with ID %d not found.\n", id);
     }
 }
