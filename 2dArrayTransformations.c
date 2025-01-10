@@ -43,9 +43,6 @@ void matrix_level_rotation(int *rows_count, int *columns_count) {
         }
     }
     
-    printf("After transformation matrix:\n");
-    display_matrix(*rows_count, *columns_count);
-    printf("\n\n");
 }
 
 void row_wise_rotation_left(int rows_count, int columns_count) {
@@ -57,9 +54,6 @@ void row_wise_rotation_left(int rows_count, int columns_count) {
         matrix[row][columns_count - 1] = first_element;
     }
     
-    printf("After transformation matrix:\n");
-    display_matrix(rows_count, columns_count);
-    printf("\n\n");
 }
 
 void row_wise_rotation_right(int rows_count, int columns_count) {
@@ -72,9 +66,6 @@ void row_wise_rotation_right(int rows_count, int columns_count) {
         matrix[row][0] = last_element;
     }
     
-    printf("After transformation matrix:\n");
-    display_matrix(rows_count, columns_count);
-    printf("\n\n");
 }
 
 void column_wise_rotation_up(int rows_count, int columns_count) {
@@ -87,9 +78,6 @@ void column_wise_rotation_up(int rows_count, int columns_count) {
         matrix[rows_count - 1][column] = top_element;
     }
     
-    printf("After transformation matrix:\n");
-    display_matrix(rows_count, columns_count);
-    printf("\n\n");
 }
 
 void column_wise_rotation_down(int rows_count, int columns_count) {
@@ -101,9 +89,6 @@ void column_wise_rotation_down(int rows_count, int columns_count) {
         matrix[0][column] = bottom_element;
     }
     
-    printf("After transformation matrix:\n");
-    display_matrix(rows_count, columns_count);
-    printf("\n\n");
 }
 
 void take_matrix_input(int *rows_count, int *columns_count) {
@@ -139,8 +124,8 @@ void display_matrix(int rows_count, int columns_count) {
 
 void menu_system(int *rows_count, int *columns_count) {
     int choice;
-    printf("Choose from the below options to transform & display matrix\n");
     do {
+        printf("Choose from the below options to transform & display matrix\n");
         printf("1. Matrix-Level Rotation\n");
         printf("2. Row-Wise Rotation (Left)\n");
         printf("3. Row-Wise Rotation (Right)\n");
@@ -149,32 +134,67 @@ void menu_system(int *rows_count, int *columns_count) {
         printf("6. Exit program\n");
         
         scanf("%d", &choice);
+        int rotation_number;
+        if(choice>0 && choice<6){
+        printf("Enter rotation number: ");
+        scanf("%d",&rotation_number);
+        }
+        
         switch (choice) {
             case 1:
-                matrix_level_rotation(rows_count, columns_count);
+                rotation_number%=4;
+                while(rotation_number--){
+                    matrix_level_rotation(rows_count, columns_count);
+                }
+                printf("After transformation matrix:\n");
+                display_matrix(*rows_count, *columns_count);
+                printf("\n\n");
                 break;
                 
             case 2:
-                row_wise_rotation_left(*rows_count, *columns_count);
+                rotation_number%=*columns_count;
+                while(rotation_number--){
+                    row_wise_rotation_left(*rows_count, *columns_count);
+                }
+                printf("After transformation matrix:\n");
+                display_matrix(*rows_count, *columns_count);
+                printf("\n\n");
                 break;
                 
             case 3:
-                row_wise_rotation_right(*rows_count, *columns_count);
+                rotation_number%=*columns_count;
+                while(rotation_number--){
+                    row_wise_rotation_right(*rows_count, *columns_count);
+                }
+                printf("After transformation matrix:\n");
+                display_matrix(*rows_count, *columns_count);
+                printf("\n\n");
                 break;
                 
             case 4:
-                column_wise_rotation_up(*rows_count, *columns_count);
+                rotation_number%=*rows_count;
+                while(rotation_number--){
+                    column_wise_rotation_up(*rows_count, *columns_count);
+                }
+                printf("After transformation matrix:\n");
+                display_matrix(*rows_count, *columns_count);
+                printf("\n\n");
                 break;
                 
             case 5:
-                column_wise_rotation_down(*rows_count, *columns_count);
+                rotation_number%=*rows_count;
+                while(rotation_number--){
+                    column_wise_rotation_down(*rows_count, *columns_count);
+                }
+                printf("After transformation matrix:\n");
+                display_matrix(*rows_count, *columns_count);
+                printf("\n\n");
                 break;
                 
             case 6:
                 printf("Exiting program!!!\n");
                 break;
             default:
-            
                 printf("Invalid input.\n");
         }
     } while (choice != 6);
