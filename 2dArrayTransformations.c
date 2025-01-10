@@ -94,13 +94,13 @@ void column_wise_rotation_down(int rows_count, int columns_count) {
 void take_matrix_input(int *rows_count, int *columns_count) {
     printf("Enter size of matrix\n");
     printf("Enter rows count: ");
-    while (scanf("%d", rows_count) == 1 && *rows_count > 100) {
-        printf("Rows count cannot be greater than 100\n");
+    while (scanf("%d", rows_count) == 0 || *rows_count > 100 || *rows_count<1) {
+        printf("Rows count cannot be greater than 100 & smaller than 1\n");
     }
     
     printf("Enter columns count: ");
-    while (scanf("%d", columns_count) == 1 && *columns_count > 100) {
-        printf("Columns count cannot be greater than 100\n");
+    while (scanf("%d", columns_count) == 0 || *columns_count > 100 || *columns_count<1) {
+        printf("Columns count cannot be greater than 100 & smaller than 1\n");
     }
     
     printf("Enter the elements of the matrix\n");
@@ -137,7 +137,10 @@ void menu_system(int *rows_count, int *columns_count) {
         int rotation_number;
         if(choice>0 && choice<6){
         printf("Enter rotation number: ");
-        scanf("%d",&rotation_number);
+        while(scanf("%d",&rotation_number)==0 || rotation_number<1){
+            printf("Enter valid number: ");
+        }
+        
         }
         
         switch (choice) {
