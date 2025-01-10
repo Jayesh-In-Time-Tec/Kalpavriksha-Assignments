@@ -7,6 +7,12 @@ int is_digit(char character) {
     return character >= '0' && character <= '9';
 }
 
+int string_length(char* string){
+    int length=0;
+    while(*string++!='\0')length++;
+    return length;
+}
+
 int take_input(char *input_message, int min_value,int max_value) {
     char input_array[100];
     int is_valid;
@@ -17,8 +23,8 @@ int take_input(char *input_message, int min_value,int max_value) {
         scanf("%s", input_array);
 
         is_valid = 1;
-        for (int i = 0; input_array[i] != '\0'; i++) {
-            if (!is_digit(input_array[i])) {
+        for (int index = 0; input_array[index] != '\0'; index++) {
+            if (!is_digit(input_array[index])) {
                 is_valid = 0;
                 break;
             }
@@ -26,8 +32,8 @@ int take_input(char *input_message, int min_value,int max_value) {
 
         if (is_valid) {
             value = 0;
-            for (int i = 0; input_array[i] != '\0'; i++) {
-                value = value * 10 + (input_array[i] - '0');
+            for (int index = 0; input_array[index] != '\0'; index++) {
+                value = value * 10 + (input_array[index] - '0');
                 if (value > max_value) {
                     is_valid = 0;
                     break;
@@ -39,7 +45,7 @@ int take_input(char *input_message, int min_value,int max_value) {
         }
 
         if (!is_valid) {
-            printf("Invalid input! Please enter a valid positive integer between %d and %lld.\n", min_value, max_value);
+            printf("Invalid input! Please enter a valid positive integer between %d and %d.\n", min_value, max_value);
         } else {
             break;
         }
@@ -60,8 +66,13 @@ int is_alphabet(char character){
 }
 
 int check_name(char* name){
+    if(string_length(name)>50){
+        printf("Name length should not exeed 50\n");
+        return 0;
+    }
     while(*name!='\0'){
         if(!is_alphabet){
+            printf("Enter name with alphabets only\n");
             return 0;
         }
         name++;
@@ -72,39 +83,42 @@ int check_name(char* name){
 void take_matrix_input(int rows,int columns,int *count
 ,int *size){
     printf("Enter the names:\n");
-    for(int i=0;i<rows;i++){
-        for(int j=0;j<columns;j++){
-            printf("Name at (%d %d):",i,j);
-            scanf("%s",matrix[i][j]);
-            
-            if(is_vowel(matrix[i][j][0])){
-                *count=*count+1;
-                if(strlen(matrix[i][j])>*size)*size=strlen(matrix[i][j]);
+    for(int row=0;row<rows;row++){
+        for(int column=0;column<columns;column++){
+            printf("Name at (%d %d):",row,column);
+            while(1){
+                scanf("%s",matrix[row][column]);
+                if(check_name(matrix[row][column])){
+                    break;
+                }
+                else{
+                    printf("Enter valid name: ");
+                }
             }
+            if(is_vowel(matrix[row][column][0])){
+                *count=*count+1;
+            }
+            if(string_length(matrix[row][column])>*size)*size=string_length(matrix[row][column]);
         }
     }
 }
 
 void display_matrix(int rows,int columns){
     printf("The 2d array of names is:\n");
-    for(int i=0;i<rows;i++){
-        for(int j=0;j<columns;j++){
-            printf("%s\t",matrix[i][j]);
+    for(int row=0;row<rows;row++){
+        for(int column=0;column<columns;column++){
+            printf("%s\t",matrix[row][column]);
         }
         printf("\n");
     }
 }
 
-void display_longest_name_with_vowel(int rows,int columns,int size){
-    if(size==0){
-        printf("No names starts with a vowel\n");
-        return;
-    }
+void display_longest_name(int rows,int columns,int size){
     printf("The longest name is: ");
-    for(int i=0;i<rows;i++){
-        for(int j=0;j<columns;j++){
-            if(strlen(matrix[i][j])==size){
-                printf("%s\n",matrix[i][j]);
+    for(int row=0;row<rows;row++){
+        for(int column=0;column<columns;column++){
+            if(strlen(matrix[row][column])==size){
+                printf("%s\n",matrix[row][column]);
                 return;
             }
         }
@@ -118,7 +132,7 @@ void solution(){
     take_matrix_input(rows,columns,&count,&size);
     display_matrix(rows,columns);
     printf("Number of vowels: %d\n",count);
-    display_longest_name_with_vowel(rows,columns,size);
+    display_longest_name(rows,columns,size);
 }
 
 int main(){
