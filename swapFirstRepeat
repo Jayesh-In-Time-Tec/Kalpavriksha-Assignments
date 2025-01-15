@@ -1,0 +1,36 @@
+#include <stdio.h>
+
+int string_length(char *string)
+{
+    int length = 0;
+    while (string[++length] != '\0')
+        ;
+    return length;
+}
+
+int main()
+{
+    char string[100];
+    printf("Enter the strin: ");
+    fgets(string, sizeof(string), stdin);
+    int size = string_length(string);
+    char input;
+    printf("Enter swap character: ");
+    scanf("%c", &input);
+    int array[256] = {0};
+    for (int index = 0; index < size - 1; index++)
+    {
+        array[string[index]]++;
+    }
+    for (int index = 0; index < size - 1; index++)
+    {
+        if (string[index] != ' ' && array[string[index]] == 1)
+        {
+            string[index] = input;
+            break;
+        }
+    }
+    printf("After swap: %s", string);
+    printf("%s", string);
+    return 0;
+}
