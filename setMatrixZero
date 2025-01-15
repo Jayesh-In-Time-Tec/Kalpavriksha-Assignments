@@ -1,0 +1,112 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+void setZeroes(int **matrix, int matrixSize, int *matrixColSize)
+{
+    int row_zero = 0, column_zero = 0;
+
+    for (int i = 0; i < matrixSize; i++)
+    {
+        if (matrix[i][0] == 0)
+            column_zero = 1;
+    }
+    for (int i = 0; i < *matrixColSize; i++)
+    {
+        if (matrix[0][i] == 0)
+            row_zero = 1;
+    }
+
+    for (int i = 1; i < matrixSize; i++)
+    {
+        for (int j = 1; j < *matrixColSize; j++)
+        {
+            if (matrix[i][j] == 0)
+            {
+                matrix[i][0] = 0;
+                matrix[0][j] = 0;
+            }
+        }
+    }
+
+    for (int i = 1; i < matrixSize; i++)
+    {
+        for (int j = 1; j < *matrixColSize; j++)
+        {
+            if (i == 0 && row_zero)
+            {
+                matrix[i][j] = 0;
+            }
+            else if (j == 0 && column_zero)
+            {
+                matrix[i][j] = 0;
+            }
+            else if (matrix[i][0] == 0 || matrix[0][j] == 0)
+            {
+                matrix[i][j] = 0;
+            }
+        }
+    }
+
+    if (column_zero)
+    {
+        for (int i = 0; i < matrixSize; i++)
+            matrix[i][0] = 0;
+    }
+    if (row_zero)
+    {
+        for (int i = 0; i < *matrixColSize; i++)
+            matrix[0][i] = 0;
+    }
+}
+
+void solution()
+{
+    printf("Enter matrix size:\n");
+    int matrixSize, matrixColSize;
+    printf("Enter number of rows: ");
+    scanf("%d", &matrixSize);
+    printf("Enter number of columns: ");
+    scanf("%d", &matrixColSize);
+
+    printf("Enter elements of matrix:\n");
+    int **matrix = (int **)malloc(matrixSize * sizeof(int *));
+    for (int i = 0; i < matrixSize; i++)
+    {
+        matrix[i] = (int *)malloc(matrixColSize * sizeof(int));
+        for (int j = 0; j < matrixColSize; j++)
+        {
+            printf("Enter elements at (%d,%d): ", i, j);
+            scanf("%d", &matrix[i][j]);
+        }
+    }
+
+    printf("Matrix before transformation:\n");
+    for (int i = 0; i < matrixSize; i++)
+    {
+        for (int j = 0; j < matrixColSize; j++)
+        {
+            printf("%d\t", matrix[i][j]);
+        }
+        printf("\n");
+    }
+
+    setZeroes(matrix, matrixSize, &matrixColSize);
+
+    printf("Matrix after transformation:\n");
+    for (int i = 0; i < matrixSize; i++)
+    {
+        for (int j = 0; j < matrixColSize; j++)
+        {
+            printf("%d\t", matrix[i][j]);
+        }
+        printf("\n");
+        free(matrix[i]);
+    }
+    free(matrix);
+}
+
+int main()
+{
+    solution();
+    return 0;
+}
