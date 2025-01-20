@@ -45,7 +45,10 @@ Linklist *initialize_node()
 {
     int data;
     printf("\nEnter value for node: ");
-    scanf("%d", &data);
+    while (scanf("%d", &data) == 1 && (data < -1000 || data > 1000))
+    {
+        printf("Enter data in range (-1000 - 1000): ");
+    }
 
     Linklist *node = (Linklist *)malloc(sizeof(Linklist));
     node->data = data;
@@ -142,7 +145,10 @@ void update_at_position(Linklist *head)
     printf("\nEnter a position to update element: ");
     scanf("%d", &position);
     printf("Enter value for node: ");
-    scanf("%d", &data);
+    while (scanf("%d", &data) == 1 && (data < -1000 || data > 1000))
+    {
+        printf("Enter data in range (-1000 - 1000): ");
+    }
 
     if (position == 1)
     {
