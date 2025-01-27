@@ -19,16 +19,15 @@ void sort(int *array, int size)
     }
 }
 
-void print_sub_k(int *array, int size, int index, int sum, int target, int *subset, int subset_size)
+void print_subset_with_k_sum(int *array, int size, int index, int target, int *subset, int subset_size)
 {
-    if (sum == target)
+    if (target == 0)
     {
         for (int i = 0; i < subset_size; i++)
         {
             printf("%d ", subset[i]);
         }
         printf("\n");
-        return;
     }
 
     for (int i = index; i < size; i++)
@@ -37,7 +36,7 @@ void print_sub_k(int *array, int size, int index, int sum, int target, int *subs
             continue;
 
         subset[subset_size] = array[i];
-        print_sub_k(array, size, i + 1, sum + array[i], target, subset, subset_size + 1);
+        print_subset_with_k_sum(array, size, i + 1, target - array[i], subset, subset_size + 1);
     }
 }
 
@@ -52,7 +51,7 @@ int main()
 
     sort(array, size);
     int subset[size];
-    print_sub_k(array, size, 0, 0, target, subset, 0);
+    print_subset_with_k_sum(array, size, 0, target, subset, 0);
 
     return 0;
 }
