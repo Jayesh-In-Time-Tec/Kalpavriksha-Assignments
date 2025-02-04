@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define MAX 100
+
 enum priority
 {
     GENERAL,
@@ -8,27 +10,27 @@ enum priority
     VIP
 };
 
-typedef struct psg
+typedef struct
 {
     int id;
     enum priority level;
     char name[50];
 } passenger;
 
-typedef struct queue
+typedef struct
 {
-    passenger passenger_data;
-    struct queue *next;
+    passenger arr[MAX];
+    int size;
 } queue;
 
-queue *head = NULL;
+queue que;
 
 int string_compare(char *s1, char *s2)
 {
     while (*s1 != '\0' && *s2 != '\0')
     {
         if (*s1 != *s2)
-            return 1;
+            break;
         s1++;
         s2++;
     }
@@ -38,65 +40,49 @@ int string_compare(char *s1, char *s2)
 int get_passenger_level(char *level)
 {
     if (string_compare(level, "VIP") == 0)
-        return 3;
-
+        return VIP;
     if (string_compare(level, "GENERAL") == 0)
-        return 1;
-
-    return 2;
+        return GENERAL;
+    return SENIOR_CITIZEN;
 }
 
 void enqueue()
 {
-    queue *node = (queue *)malloc(sizeof(queue));
+    if (que.size >= MAX)
+    {
+        printf("Queue is full\n");
+        return;
+    }
+
+    passenger temporary;
     char level[50];
-    scanf("%d", &node->passenger_data.id);
-
+    scanf("%d", &temporary.id);
     scanf("%s", level);
-    node->passenger_data.level = get_passenger_level(level);
-
+    temporary.level = get_passenger_level(level);
     getchar();
-    scanf("%s", node->passenger_data.name);
+    scanf("%s", temporary.name);
 
-    if (head == NULL)
+    int i = que.size - 1;
+    while (i >= 0 && que.arr[i].level < temporary.level)
     {
-        node->next = NULL;
-        head = node;
-        return;
+        que.arr[i + 1] = que.arr[i];
+        i--;
     }
-
-    queue *traverse = head;
-    queue *previous = NULL;
-    while (traverse && traverse->passenger_data.level >= node->passenger_data.level)
-    {
-        previous = traverse;
-        traverse = traverse->next;
-    }
-
-    if (previous == NULL)
-    {
-        node->next = head;
-        head = node;
-        return;
-    }
-
-    previous->next = node;
-    node->next = traverse;
+    que.arr[i + 1] = temporary;
+    que.size++;
 }
 
 void print_level(int value)
 {
     switch (value)
     {
-    case 1:
+    case GENERAL:
         printf("GENERAL\n");
         break;
-
-    case 2:
+    case SENIOR_CITIZEN:
         printf("SENIOR_CITIZEN\n");
         break;
-
-    case 3:
+    case VIP:
         printf("VIP\n");
         break;
     }
@@ -104,32 +90,40 @@ void print_level(int value)
 
 void dequeue()
 {
-    if (head == NULL)
+    if (que.size == 0)
     {
         printf("List is empty\n");
         return;
     }
 
-    printf("Serving passenger: ");
-    printf("ID:%d,\t Name:%s,\t Type:\n", head->passenger_data.id, head->passenger_data.name);
-    print_level(head->passenger_data.level);
-    head = head->next;
+    printf("Serving passenger: ID:%d, Name:%s, Type: ", que.arr[0].id, que.arr[0].name);
+    print_level(que.arr[0].level);
+
+    for (int i = 1; i < que.size; i++)
+    {
+        que.arr[i - 1] = que.arr[i];
+    }
+    que.size--;
 }
 
 void print_list()
 {
-    queue *traverse = head;
-    printf("Waiting passengers:\n");
-    while (traverse)
+    if (que.size == 0)
     {
-        printf("ID:%d,\t Name:%s,\t Level:", traverse->passenger_data.id, traverse->passenger_data.name);
-        print_level(traverse->passenger_data.level);
-        traverse = traverse->next;
+        printf("No waiting passengers\n");
+        return;
+    }
+    printf("Waiting passengers:\n");
+    for (int i = 0; i < que.size; i++)
+    {
+        printf("ID:%d, Name:%s, Level: ", que.arr[i].id, que.arr[i].name);
+        print_level(que.arr[i].level);
     }
 }
 
 int main()
 {
+    que.size = 0;
     int operations;
     scanf("%d", &operations);
 
@@ -142,16 +136,13 @@ int main()
         case 1:
             enqueue();
             break;
-
         case 2:
             dequeue();
             break;
-
         case 3:
             print_list();
             break;
         }
     }
-
     return 0;
 }
